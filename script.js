@@ -169,6 +169,12 @@ function updateUI() {
     updateSkillUI('skill-inject', state.skills.inject);
     updateSkillUI('skill-firewall', state.skills.firewall);
 
+    // Prestige
+    const gain = Math.floor(Math.sqrt(state.totalLines / 1e12));
+    document.getElementById('prestige-gain').textContent = gain;
+    document.getElementById('prestige-btn').classList.toggle('disabled', gain < 1);
+    document.getElementById('prestige-btn').onclick = () => triggerSingularity();
+
     updateCards();
 }
 
@@ -267,6 +273,24 @@ function buyUpgrade(id) {
             });
         }
     }
+}
+
+function triggerSingularity() {
+    const gain = Math.floor(Math.sqrt(state.totalLines / 1e12));
+    if (gain < 1) return;
+
+    state.prestige += gain;
+    state.lines = 0;
+    UPGRADES.forEach(u => state.upgrades[u.id] = 0);
+    state.synergies = [];
+    
+    document.body.classList.add('singularity-glitch');
+    setTimeout(() => {
+        document.body.classList.remove('singularity-glitch');
+        initUI();
+        updateUI();
+        writeConsole(`SINGULARITÉ ATTEINTE : +${gain} niveaux.`, "success");
+    }, 2000);
 }
 
 function writeConsole(txt, type="") {
