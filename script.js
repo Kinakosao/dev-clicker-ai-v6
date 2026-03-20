@@ -106,8 +106,9 @@ function addLines(n, manual = false) {
     
     if(manual) {
         state.clicks++;
-        AudioEngine.playClick();
+        AudioEngine.playClick(getLPS());
         FX.spawn(window.event?.clientX, window.event?.clientY);
+        FX.spawnText(window.event?.clientX, window.event?.clientY, `+${format(n)}`);
     }
 
     updateUI();
@@ -159,6 +160,16 @@ function handleOffline() {
 }
 
 // --- UI Rendering ---
+
+function animateKey() {
+    const paths = document.querySelectorAll('#keyboard-svg path');
+    if (paths.length === 0) return;
+    // Exclude the first path (main frame) if there are multiple paths
+    const keys = paths.length > 1 ? Array.from(paths).slice(1) : Array.from(paths);
+    const randomKey = keys[Math.floor(Math.random() * keys.length)];
+    randomKey.classList.add('key-pressed');
+    setTimeout(() => randomKey.classList.remove('key-pressed'), 100);
+}
 
 function format(n) {
     if(n >= 1e12) return (n/1e12).toFixed(2) + 'T';
@@ -437,15 +448,29 @@ const FX = {
         }
     },
 
+    spawnText(x, y, text, type="normal") {
+        if(!x) return;
+        const el = document.createElement('div');
+        el.className = `floating-text ${type}`;
+        el.textContent = text;
+        el.style.left = `${x}px`;
+        el.style.top = `${y}px`;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 1000);
+    },
+
     update() {
         this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
+        this.ctx.shadowBlur = 8;
         this.particles = this.particles.filter(p => {
             p.x += p.vx; p.y += p.vy; p.life -= 0.02;
             this.ctx.fillStyle = p.color;
+            this.ctx.shadowColor = p.color;
             this.ctx.globalAlpha = p.life;
             this.ctx.fillRect(p.x, p.y, 4, 4);
             return p.life > 0;
         });
+        this.ctx.shadowBlur = 0;
         requestAnimationFrame(() => this.update());
     }
 };
@@ -514,7 +539,11 @@ initUI(); initTabs(); updateUI();
 handleOffline();
 writeConsole("THE SINGULARITY v6.0 : CHARGEMENT DU NOYAU");
 
-setInterval(() => addLines(getLPS() / 10), 100);
+setInterval(() => {
+    const lps = getLPS();
+    addLines(lps / 10);
+    AudioEngine.updateHum(lps);
+}, 100);
 setInterval(() => STOCK.update(), 2000);
 setInterval(() => { state.lastSave = Date.now(); localStorage.setItem('devClicker_v6', JSON.stringify(state)); }, 30000);
 
@@ -534,5 +563,21 @@ const triggerAIStock = () => {
     }, Math.random() * 15000 + 15000);
 };
 triggerAIStock();
+
+document.addEventListener('keydown', (e) => {
+    if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
+        e.preventDefault();
+    }
+    animateKey();
+    addLines(getClickPower(), true);
+});
+
+const keyboard = document.getElementById('keyboard-svg');
+if (keyboard) {
+    keyboard.onclick = (e) => {
+        animateKey();
+        addLines(getClickPower(), true);
+    };
+}
 
 window.onresize = () => { FX.init(); STOCK.draw(); };

@@ -95,6 +95,18 @@ main { display: flex; flex-direction: column; align-items: center; justify-conte
     transition: 0.2s;
 }
 
+#keyboard-svg path {
+    transition: all 0.1s ease;
+    transform-origin: center;
+}
+
+.key-pressed {
+    fill: var(--accent-primary) !important;
+    stroke: var(--accent-primary) !important;
+    transform: scale(0.9) translateY(1px);
+    filter: drop-shadow(0 0 10px var(--accent-primary));
+}
+
 .stock-market-panel {
     width: 100%; max-width: 400px; background: rgba(0,0,0,0.4);
     border: 1px solid var(--border); border-radius: 16px; padding: 1rem; margin-top: 1.5rem;
@@ -195,3 +207,25 @@ footer {
 .panel-container::-webkit-scrollbar { width: 4px; }
 .panel-container::-webkit-scrollbar-track { background: transparent; }
 .panel-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* --- Floating Text & Neon Particles --- */
+.floating-text {
+    position: fixed;
+    pointer-events: none;
+    font-family: 'Fira Code', monospace;
+    font-weight: 800;
+    font-size: 1.25rem;
+    z-index: 1000;
+    animation: floatUp 1s cubic-bezier(0, 0, 0.2, 1) forwards;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    white-space: nowrap;
+}
+
+@keyframes floatUp {
+    0% { transform: translate(-50%, -50%) translateY(0); opacity: 1; }
+    100% { transform: translate(-50%, -50%) translateY(-100px); opacity: 0; }
+}
+
+.floating-text.normal { color: var(--accent-primary); text-shadow: 0 0 10px var(--accent-primary); }
+.floating-text.crit { color: var(--accent-gold); text-shadow: 0 0 20px var(--accent-gold); font-size: 1.75rem; }
+.floating-text.ai { color: var(--accent-tech); text-shadow: 0 0 15px var(--accent-tech); }
