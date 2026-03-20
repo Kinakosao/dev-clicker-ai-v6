@@ -108,6 +108,7 @@ function addLines(n, manual = false) {
         state.clicks++;
         AudioEngine.playClick(getLPS());
         FX.spawn(window.event?.clientX, window.event?.clientY);
+        FX.spawnText(window.event?.clientX, window.event?.clientY, `+${format(n)}`);
     }
 
     updateUI();
@@ -447,15 +448,29 @@ const FX = {
         }
     },
 
+    spawnText(x, y, text, type="normal") {
+        if(!x) return;
+        const el = document.createElement('div');
+        el.className = `floating-text ${type}`;
+        el.textContent = text;
+        el.style.left = `${x}px`;
+        el.style.top = `${y}px`;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 1000);
+    },
+
     update() {
         this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
+        this.ctx.shadowBlur = 8;
         this.particles = this.particles.filter(p => {
             p.x += p.vx; p.y += p.vy; p.life -= 0.02;
             this.ctx.fillStyle = p.color;
+            this.ctx.shadowColor = p.color;
             this.ctx.globalAlpha = p.life;
             this.ctx.fillRect(p.x, p.y, 4, 4);
             return p.life > 0;
         });
+        this.ctx.shadowBlur = 0;
         requestAnimationFrame(() => this.update());
     }
 };
