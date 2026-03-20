@@ -86,6 +86,7 @@ function getClickPower() {
 function addLines(n, manual = false) {
     if(isHacker && manual) {
         hackerHealth -= 5;
+        updateHackerUI();
         if(hackerHealth <= 0) winHacker();
         return;
     }
@@ -275,6 +276,55 @@ function buyUpgrade(id) {
     }
 }
 
+// --- Hacker Attack ---
+
+function startHackerAttack() {
+    if(isFirewall || isHacker) return;
+    
+    isHacker = true;
+    hackerHealth = 100;
+    updateHackerUI();
+    document.getElementById('hacker-overlay').style.display = 'flex';
+    AudioEngine.playAlert();
+    writeConsole("⚠️ ALERTE DE SÉCURITÉ : INTRUSION DÉTECTÉE !", "danger");
+
+    const attackTimer = setInterval(() => {
+        if(!isHacker) {
+            clearInterval(attackTimer);
+            return;
+        }
+        hackerHealth -= 2;
+        updateHackerUI();
+        if(hackerHealth <= 0) {
+            failHacker();
+            clearInterval(attackTimer);
+        }
+    }, 1000);
+}
+
+function updateHackerUI() {
+    document.getElementById('hacker-health').textContent = Math.max(0, hackerHealth);
+    document.getElementById('hacker-progress-bar').style.width = Math.max(0, hackerHealth) + '%';
+}
+
+function winHacker() {
+    isHacker = false;
+    document.getElementById('hacker-overlay').style.display = 'none';
+    const reward = Math.floor(getLPS() * 300);
+    addLines(reward);
+    writeConsole(`SYSTÈME SÉCURISÉ : +${format(reward)} LDC récompense !`, "success");
+    AudioEngine.playSuccess();
+}
+
+function failHacker() {
+    isHacker = false;
+    document.getElementById('hacker-overlay').style.display = 'none';
+    const penalty = Math.floor(state.lines * 0.2);
+    state.lines -= penalty;
+    writeConsole(`FAILLE CRITIQUE : ${format(penalty)} LDC perdues.`, "danger");
+    updateUI();
+}
+
 function triggerSingularity() {
     const gain = Math.floor(Math.sqrt(state.totalLines / 1e12));
     if (gain < 1) return;
@@ -407,6 +457,11 @@ writeConsole("THE SINGULARITY v6.0 : CHARGEMENT DU NOYAU");
 setInterval(() => addLines(getLPS() / 10), 100);
 setInterval(() => STOCK.update(), 2000);
 setInterval(() => { state.lastSave = Date.now(); localStorage.setItem('devClicker_v6', JSON.stringify(state)); }, 30000);
+
+// Hacker Random Event (2% chance every minute)
+setInterval(() => {
+    if(Math.random() < 0.02) startHackerAttack();
+}, 60000);
 
 const triggerAIStock = () => {
     setTimeout(async () => {

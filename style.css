@@ -132,3 +132,20 @@ footer {
     filter: hue-rotate(90deg) invert(1);
     background: white !important;
 }
+
+/* --- Hacker Attack --- */
+#hacker-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(185, 28, 28, 0.9); z-index: 5000;
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    backdrop-filter: blur(10px); color: white; text-align: center;
+}
+#hacker-prompt { font-size: 2.5rem; margin-bottom: 2rem; text-shadow: 0 0 20px rgba(0,0,0,0.5); }
+#hacker-progress-container {
+    width: 60%; height: 30px; background: rgba(0,0,0,0.3);
+    border: 2px solid white; border-radius: 15px; overflow: hidden;
+}
+#hacker-progress-bar {
+    width: 100%; height: 100%; background: white;
+    box-shadow: 0 0 20px white; transition: width 0.3s;
+}
