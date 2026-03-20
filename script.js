@@ -246,6 +246,13 @@ function buyUpgrade(id) {
         state.upgrades[id]++;
         AudioEngine.playSuccess();
         updateUI();
+
+        // AI narrative log
+        if (window.AI) {
+            AI.generateLog(`Purchased ${u.name} (level ${state.upgrades[id]})`).then(log => {
+                writeConsole(log, "ai");
+            });
+        }
     }
 }
 
@@ -257,6 +264,7 @@ function writeConsole(txt, type="") {
     el.appendChild(line);
     if(el.children.length > 5) el.removeChild(el.firstChild);
 }
+window.writeConsole = writeConsole;
 
 // --- FX Particle Engine ---
 
@@ -334,6 +342,7 @@ const saved = localStorage.getItem('devClicker_v6');
 if(saved) state = {...state, ...JSON.parse(saved)};
 
 AudioEngine.init(); FX.init(); FX.update();
+if (window.AI) AI.init();
 initUI(); updateUI();
 handleOffline();
 writeConsole("THE SINGULARITY v6.0 : CHARGEMENT DU NOYAU");
