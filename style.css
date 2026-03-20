@@ -117,3 +117,81 @@ footer {
 }
 .action-btn:hover:not(:disabled) { background: rgba(56, 189, 248, 0.15); border-color: var(--accent-primary); }
 .prestige-btn { background: linear-gradient(45deg, #4f46e5, #9333ea); border: none; width: 100%; margin-top: 1rem; font-size: 1.1rem; }
+
+/* --- Singularity Glitch --- */
+@keyframes glitch {
+    0% { transform: translate(0) }
+    20% { transform: translate(-5px, 5px) }
+    40% { transform: translate(-5px, -5px) }
+    60% { transform: translate(5px, 5px) }
+    80% { transform: translate(5px, -5px) }
+    100% { transform: translate(0) }
+}
+.singularity-glitch {
+    animation: glitch 0.2s infinite;
+    filter: hue-rotate(90deg) invert(1);
+    background: white !important;
+}
+
+/* --- Hacker Attack --- */
+#hacker-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(185, 28, 28, 0.9); z-index: 5000;
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    backdrop-filter: blur(10px); color: white; text-align: center;
+}
+#hacker-prompt { font-size: 2.5rem; margin-bottom: 2rem; text-shadow: 0 0 20px rgba(0,0,0,0.5); }
+#hacker-progress-container {
+    width: 60%; height: 30px; background: rgba(0,0,0,0.3);
+    border: 2px solid white; border-radius: 15px; overflow: hidden;
+}
+#hacker-progress-bar {
+    width: 100%; height: 100%; background: white;
+    box-shadow: 0 0 20px white; transition: width 0.3s;
+}
+
+/* --- Tabs & Panels --- */
+.tabs {
+    display: flex;
+    background: rgba(0,0,0,0.2);
+    padding: 0.5rem;
+    gap: 0.5rem;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 0.5rem;
+    background: none;
+    border: 1px solid transparent;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+.tab-btn.active {
+    color: var(--accent-primary);
+    background: rgba(56, 189, 248, 0.1);
+    border-color: var(--border);
+}
+
+.panel-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+.panel {
+    display: none;
+}
+
+.panel.active {
+    display: block;
+}
+
+.panel-container::-webkit-scrollbar { width: 4px; }
+.panel-container::-webkit-scrollbar-track { background: transparent; }
+.panel-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
