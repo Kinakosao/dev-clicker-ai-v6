@@ -281,6 +281,7 @@ function triggerSingularity() {
 
     state.prestige += gain;
     state.lines = 0;
+    state.totalLines = 0;
     UPGRADES.forEach(u => state.upgrades[u.id] = 0);
     state.synergies = [];
     
