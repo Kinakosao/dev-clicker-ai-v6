@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dev Clicker v6.0 | The Singularity</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="canvas-bg"></canvas>
+    <canvas id="canvas-fx"></canvas>
+
+    <!-- Offline Reward Modal -->
+    <div id="offline-modal">
+        <div class="modal-content">
+            <h2 style="color: var(--accent-primary); margin-bottom: 1rem;">RÉCUPÉRATION DE DONNÉES</h2>
+            <p id="offline-msg" style="margin-bottom: 2rem;">Pendant votre absence, vos systèmes ont continué de compiler...</p>
+            <h1 id="offline-amount" style="font-family: 'Fira Code', monospace; color: var(--success); margin-bottom: 2rem;">0</h1>
+            <button class="action-btn" id="btn-collect-offline" style="width: 100%;">TRANSFERER DANS LE NOYAU</button>
+        </div>
+    </div>
+
+    <!-- Hacker Attack Overlay -->
+    <div id="hacker-overlay">
+        <h2 id="hacker-prompt">⚠️ ATTAQUE EN COURS ⚠️<br>VITE ! NEUTRALISEZ L'INTRUS !</h2>
+        <div id="hacker-progress-container">
+            <div id="hacker-progress-bar"></div>
+        </div>
+        <p style="color: white; margin-top: 1rem; font-family: 'Fira Code', monospace;">INTÉGRITÉ : <span id="hacker-health">100</span>%</p>
+    </div>
+
+    <div class="app-container">
+        
+        <!-- SIDE LEFT: INFRA & SYNERGIES -->
+        <aside>
+            <nav class="tabs">
+                <button class="tab-btn active" data-target="panel-infra">Systèmes</button>
+                <button class="tab-btn" data-target="panel-synergy">Synergies</button>
+            </nav>
+            <div class="panel-container">
+                <div id="panel-infra" class="panel active">
+                    <div class="upgrade-list" id="upgrade-list"></div>
+                </div>
+                <div id="panel-synergy" class="panel">
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1rem;">Bonus passifs débloqués par vos combinaisons de systèmes.</p>
+                    <div class="upgrade-list" id="synergy-list"></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN VIEW: CORE & SKILLS -->
+        <main>
+            <div class="score-display">
+                <div id="score">0</div>
+                <div class="lps-display"><span>CODE/SEC:</span> <span id="lps">0</span></div>
+            </div>
+
+            <div id="click-area">
+                <svg id="keyboard-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 17H4C2.89543 17 2 16.1046 2 15V9C2 7.89543 2.89543 7 4 7H20C21.1046 7 22 7.89543 22 9V15C22 16.1046 21.1046 17 20 17Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M6 10H6.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M10 10H10.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M14 10H14.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M18 10H18.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M6 14H6.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M10 14H14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M18 14H18.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+
+            <div class="cyberdeck" id="cyberdeck">
+                <!-- Skill 1: Overclock -->
+                <button class="skill-btn" id="skill-overclock" title="Overclocking (x2 LPS - 30s)">
+                    ⚡ <div class="tooltip">Overclocking (x2 LPS)</div>
+                </button>
+                <!-- Skill 2: Instant Code -->
+                <button class="skill-btn locked" id="skill-inject" title="Injection Directe (Gain 10 min LPS)">
+                    💉 <div class="tooltip">Injection Directe</div>
+                </button>
+                <!-- Skill 3: Firewall -->
+                <button class="skill-btn locked" id="skill-firewall" title="Pare-feu Total (Immunité 5 min)">
+                    🛡️ <div class="tooltip">Pare-feu Total</div>
+                </button>
+            </div>
+
+            <div class="stock-market-panel">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span style="font-size: 0.7rem; font-weight: bold; color: var(--accent-gold);">STOCK EXCHANGE</span>
+                    <span id="stock-price" style="font-family: 'Fira Code', monospace; color: var(--success); font-size: 0.8rem;">$100.00</span>
+                </div>
+                <canvas id="stock-chart" height="60"></canvas>
+                <div style="display: flex; gap: 5px; margin-top: 5px;">
+                    <button class="action-btn" id="btn-buy-stock" style="flex:1; padding: 4px; font-size: 0.7rem;">BUY</button>
+                    <button class="action-btn" id="btn-sell-stock" style="flex:1; padding: 4px; font-size: 0.7rem;">SELL</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- SIDE RIGHT: STATS & CONTRACTS -->
+        <aside>
+            <nav class="tabs">
+                <button class="tab-btn active" data-target="panel-intel">Intel</button>
+                <button class="tab-btn" data-target="panel-jobs">Missions</button>
+            </nav>
+            <div class="panel-container">
+                <div id="panel-intel" class="panel active">
+                    <div class="stat-row"><span class="stat-label">Total Code</span><span class="stat-value" id="stat-total-lines">0</span></div>
+                    <div class="stat-row"><span class="stat-label">Clicks</span><span class="stat-value" id="stat-manual-clicks">0</span></div>
+                    <div class="stat-row"><span class="stat-label">Multiplier</span><span class="stat-value">x<span id="stat-multiplier">1.0</span></span></div>
+                    
+                    <h2 style="font-size: 0.8rem; margin-top: 1rem; color: var(--text-muted); text-transform: uppercase;">Récompenses</h2>
+                    <div class="achievement-grid" id="achievement-grid"></div>
+                    
+                    <button class="action-btn prestige-btn" id="prestige-btn">SINGULARITÉ (+<span id="prestige-gain">0</span>)</button>
+                </div>
+
+                <div id="panel-jobs" class="panel">
+                    <div id="contracts-container"></div>
+                </div>
+            </div>
+        </aside>
+
+        <footer id="code-console"></footer>
+    </div>
+
+    <script src="sound.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
