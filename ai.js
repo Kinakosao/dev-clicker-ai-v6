@@ -31,6 +31,16 @@ const AI = {
             console.error("AI Log generation failed", e);
             return `Log: ${context}`;
         }
+    },
+    async analyzeSentiment(text) {
+        try {
+            const pipe = await this.loadModel('sentiment-analysis', 'Xenova/distilbert-base-uncased-finetuned-sst-2-english');
+            const result = await pipe(text);
+            return result[0]; // { label: 'POSITIVE', score: 0.99 }
+        } catch (e) {
+            console.error("AI Sentiment analysis failed", e);
+            return { label: 'NEUTRAL', score: 0.5 };
+        }
     }
 };
 
