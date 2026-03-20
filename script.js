@@ -160,6 +160,16 @@ function handleOffline() {
 
 // --- UI Rendering ---
 
+function animateKey() {
+    const paths = document.querySelectorAll('#keyboard-svg path');
+    if (paths.length === 0) return;
+    // Exclude the first path (main frame) if there are multiple paths
+    const keys = paths.length > 1 ? Array.from(paths).slice(1) : Array.from(paths);
+    const randomKey = keys[Math.floor(Math.random() * keys.length)];
+    randomKey.classList.add('key-pressed');
+    setTimeout(() => randomKey.classList.remove('key-pressed'), 100);
+}
+
 function format(n) {
     if(n >= 1e12) return (n/1e12).toFixed(2) + 'T';
     if(n >= 1e9) return (n/1e9).toFixed(2) + 'B';
@@ -534,5 +544,21 @@ const triggerAIStock = () => {
     }, Math.random() * 15000 + 15000);
 };
 triggerAIStock();
+
+document.addEventListener('keydown', (e) => {
+    if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
+        e.preventDefault();
+    }
+    animateKey();
+    addLines(getClickPower(), true);
+});
+
+const keyboard = document.getElementById('keyboard-svg');
+if (keyboard) {
+    keyboard.onclick = (e) => {
+        animateKey();
+        addLines(getClickPower(), true);
+    };
+}
 
 window.onresize = () => { FX.init(); STOCK.draw(); };

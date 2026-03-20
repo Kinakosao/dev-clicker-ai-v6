@@ -95,6 +95,18 @@ main { display: flex; flex-direction: column; align-items: center; justify-conte
     transition: 0.2s;
 }
 
+#keyboard-svg path {
+    transition: all 0.1s ease;
+    transform-origin: center;
+}
+
+.key-pressed {
+    fill: var(--accent-primary) !important;
+    stroke: var(--accent-primary) !important;
+    transform: scale(0.9) translateY(1px);
+    filter: drop-shadow(0 0 10px var(--accent-primary));
+}
+
 .stock-market-panel {
     width: 100%; max-width: 400px; background: rgba(0,0,0,0.4);
     border: 1px solid var(--border); border-radius: 16px; padding: 1rem; margin-top: 1.5rem;
