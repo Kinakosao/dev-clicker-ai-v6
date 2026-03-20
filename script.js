@@ -106,7 +106,7 @@ function addLines(n, manual = false) {
     
     if(manual) {
         state.clicks++;
-        AudioEngine.playClick();
+        AudioEngine.playClick(getLPS());
         FX.spawn(window.event?.clientX, window.event?.clientY);
     }
 
@@ -524,7 +524,11 @@ initUI(); initTabs(); updateUI();
 handleOffline();
 writeConsole("THE SINGULARITY v6.0 : CHARGEMENT DU NOYAU");
 
-setInterval(() => addLines(getLPS() / 10), 100);
+setInterval(() => {
+    const lps = getLPS();
+    addLines(lps / 10);
+    AudioEngine.updateHum(lps);
+}, 100);
 setInterval(() => STOCK.update(), 2000);
 setInterval(() => { state.lastSave = Date.now(); localStorage.setItem('devClicker_v6', JSON.stringify(state)); }, 30000);
 
