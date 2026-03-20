@@ -124,6 +124,11 @@
     </div>
 
     <script src="sound.js"></script>
-    <script src="script.js"></script>
+    <script type="module">
+      import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers';
+      window.transformers = { pipeline, env };
+    </script>
+    <script type="module" src="ai.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>

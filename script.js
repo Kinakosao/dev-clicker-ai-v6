@@ -18,6 +18,19 @@ const SYNERGIES = [
     { id: 'syn_3', name: 'Singularité', req: { neural: 20 }, mult: 2, target: 'global', desc: 'Éveil technologique : Global x2.' }
 ];
 
+const TECH_NEWS = [
+    "Une faille majeure découverte dans le protocole de chiffrement quantique.",
+    "L'adoption massive des interfaces neurales stimule la croissance technologique.",
+    "La pénurie mondiale de semi-conducteurs s'aggrave, affectant la production d'IA.",
+    "Une percée dans le stockage d'énergie promet des data centers plus efficaces.",
+    "Le gouvernement annonce de nouvelles régulations sur le métavers dystopique.",
+    "Une IA génératrice d'un nouveau genre crée son propre langage de programmation.",
+    "Le déploiement du réseau 7G suscite des inquiétudes pour la santé publique.",
+    "Les méga-corporations fusionnent pour former une entité hégémonique mondiale.",
+    "Un groupe de hackers célèbre revendique la cyber-attaque contre la Banque Centrale.",
+    "La demande pour les processeurs de lien neural atteint un sommet historique."
+];
+
 // --- State ---
 let state = {
     lines: 0,
@@ -246,6 +259,13 @@ function buyUpgrade(id) {
         state.upgrades[id]++;
         AudioEngine.playSuccess();
         updateUI();
+
+        // AI narrative log
+        if (window.AI) {
+            AI.generateLog(`Purchased ${u.name} (level ${state.upgrades[id]})`).then(log => {
+                writeConsole(log, "ai");
+            });
+        }
     }
 }
 
@@ -257,6 +277,7 @@ function writeConsole(txt, type="") {
     el.appendChild(line);
     if(el.children.length > 5) el.removeChild(el.firstChild);
 }
+window.writeConsole = writeConsole;
 
 // --- FX Particle Engine ---
 
@@ -296,6 +317,25 @@ const FX = {
 
 // --- Stock & Background ---
 
+async function updateAIStock() {
+    if (!window.AI) return;
+    const news = TECH_NEWS[Math.floor(Math.random() * TECH_NEWS.length)];
+    const sentiment = await AI.analyzeSentiment(news);
+    
+    const isPositive = sentiment.label === 'POSITIVE';
+    state.stock.price *= isPositive ? 1.2 : 0.8;
+    
+    writeConsole(`NEWS: ${news}`, isPositive ? "success" : "danger");
+    
+    // UI Update
+    const priceEl = document.getElementById('stock-price');
+    if (priceEl) {
+        priceEl.textContent = `$${state.stock.price.toFixed(2)}`;
+        priceEl.style.color = isPositive ? 'var(--success)' : 'var(--danger)';
+    }
+    STOCK.draw();
+}
+
 const STOCK = {
     update() {
         const trend = (Math.random() - 0.5) * 12;
@@ -334,6 +374,7 @@ const saved = localStorage.getItem('devClicker_v6');
 if(saved) state = {...state, ...JSON.parse(saved)};
 
 AudioEngine.init(); FX.init(); FX.update();
+if (window.AI) AI.init();
 initUI(); updateUI();
 handleOffline();
 writeConsole("THE SINGULARITY v6.0 : CHARGEMENT DU NOYAU");
@@ -341,4 +382,13 @@ writeConsole("THE SINGULARITY v6.0 : CHARGEMENT DU NOYAU");
 setInterval(() => addLines(getLPS() / 10), 100);
 setInterval(() => STOCK.update(), 2000);
 setInterval(() => { state.lastSave = Date.now(); localStorage.setItem('devClicker_v6', JSON.stringify(state)); }, 30000);
+
+const triggerAIStock = () => {
+    setTimeout(async () => {
+        await updateAIStock();
+        triggerAIStock();
+    }, Math.random() * 15000 + 15000);
+};
+triggerAIStock();
+
 window.onresize = () => { FX.init(); STOCK.draw(); };
