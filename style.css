@@ -149,3 +149,49 @@ footer {
     width: 100%; height: 100%; background: white;
     box-shadow: 0 0 20px white; transition: width 0.3s;
 }
+
+/* --- Tabs & Panels --- */
+.tabs {
+    display: flex;
+    background: rgba(0,0,0,0.2);
+    padding: 0.5rem;
+    gap: 0.5rem;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 0.5rem;
+    background: none;
+    border: 1px solid transparent;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+.tab-btn.active {
+    color: var(--accent-primary);
+    background: rgba(56, 189, 248, 0.1);
+    border-color: var(--border);
+}
+
+.panel-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+.panel {
+    display: none;
+}
+
+.panel.active {
+    display: block;
+}
+
+.panel-container::-webkit-scrollbar { width: 4px; }
+.panel-container::-webkit-scrollbar-track { background: transparent; }
+.panel-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }

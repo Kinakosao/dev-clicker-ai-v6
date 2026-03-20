@@ -46,14 +46,14 @@ let state = {
         overclock: { lastUsed: 0, cd: 60000, duration: 30000 },
         inject: { lastUsed: 0, cd: 300000, req: 1000000 },
         firewall: { lastUsed: 0, cd: 600000, req: 10000000 }
-    }
+    },
+    contracts: []
 };
 
 let isOverclock = false;
 let isFirewall = false;
 let isHacker = false;
 let hackerHealth = 100;
-let contracts = [];
 
 // Init Maps
 UPGRADES.forEach(u => state.upgrades[u.id] = 0);
@@ -93,6 +93,16 @@ function addLines(n, manual = false) {
 
     state.lines += n;
     if(n > 0) state.totalLines += n;
+
+    // Check Contracts
+    state.contracts.forEach(c => {
+        if(c.active && state.totalLines >= c.target) {
+            c.active = false;
+            state.lines += c.reward;
+            writeConsole(`MISSION RÉUSSIE : ${c.description}. +${format(c.reward)} LDC.`, "success");
+            if (window.AudioEngine) AudioEngine.playSuccess();
+        }
+    });
     
     if(manual) {
         state.clicks++;
@@ -177,6 +187,56 @@ function updateUI() {
     document.getElementById('prestige-btn').onclick = () => triggerSingularity();
 
     updateCards();
+    renderContracts();
+}
+
+function renderContracts() {
+    const container = document.getElementById('contracts-container');
+    if(!container) return;
+    container.innerHTML = '';
+    state.contracts.forEach(c => {
+        if(!c.active) return;
+        const p = Math.min(100, (state.totalLines / c.target) * 100);
+        const card = document.createElement('div');
+        card.className = 'upgrade-card';
+        card.innerHTML = `
+            <div class="card-info">
+                <h3>CONTRACT # ${c.id.toString().slice(-4)}</h3>
+                <p>${c.description}</p>
+                <div class="card-cost" style="color:var(--success)">+${format(c.reward)} LDC</div>
+            </div>
+            <div class="card-count">${Math.floor(p)}%</div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function generateContract() {
+    if(state.contracts.filter(c=>c.active).length >= 3) return;
+    const target = Math.floor(state.totalLines * 1.5 + 1000);
+    const reward = Math.floor(target * 0.2);
+    state.contracts.push({
+        id: Date.now(),
+        target,
+        reward,
+        description: `Compiler ${format(target)} lignes`,
+        active: true
+    });
+    renderContracts();
+}
+
+function initTabs() {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.onclick = () => {
+            const nav = btn.parentElement;
+            const container = nav.nextElementSibling;
+            nav.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            container.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            const target = document.getElementById(btn.dataset.target);
+            if(target) target.classList.add('active');
+        };
+    });
 }
 
 function updateSkillUI(elId, skill) {
@@ -450,13 +510,17 @@ if(saved) state = {...state, ...JSON.parse(saved)};
 
 AudioEngine.init(); FX.init(); FX.update();
 if (window.AI) AI.init();
-initUI(); updateUI();
+initUI(); initTabs(); updateUI();
 handleOffline();
 writeConsole("THE SINGULARITY v6.0 : CHARGEMENT DU NOYAU");
 
 setInterval(() => addLines(getLPS() / 10), 100);
 setInterval(() => STOCK.update(), 2000);
 setInterval(() => { state.lastSave = Date.now(); localStorage.setItem('devClicker_v6', JSON.stringify(state)); }, 30000);
+
+// Contract Generation
+setInterval(() => generateContract(), 300000);
+if(state.contracts.filter(c=>c.active).length === 0) generateContract();
 
 // Hacker Random Event (2% chance every minute)
 setInterval(() => {
