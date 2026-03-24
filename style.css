@@ -439,3 +439,88 @@ body.overload-active #overload-indicator {
 body.overload-active #canvas-bg {
     filter: hue-rotate(180deg) contrast(1.5);
 }
+
+/* --- Nova Co-Pilot HUD --- */
+#nova-hud {
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid #38bdf8;
+    border-radius: 12px;
+    padding: 1rem;
+    margin: 0.5rem;
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+    animation: nova-pulse 4s infinite alternate;
+}
+
+@keyframes nova-pulse {
+    from { border-color: rgba(56, 189, 248, 0.4); box-shadow: 0 0 10px rgba(56, 189, 248, 0.1); }
+    to { border-color: #38bdf8; box-shadow: 0 0 20px rgba(56, 189, 248, 0.4); }
+}
+
+.nova-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(56, 189, 248, 0.3);
+    padding-bottom: 0.5rem;
+}
+
+.nova-title {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #38bdf8;
+    letter-spacing: 1px;
+}
+
+.nova-status-dot {
+    width: 8px;
+    height: 8px;
+    background: #38bdf8;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #38bdf8;
+}
+
+#nova-msg {
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: #f8fafc;
+    margin-bottom: 1rem;
+    min-height: 2.4em;
+    font-style: italic;
+    border-left: 2px solid #38bdf8;
+    padding-left: 0.75rem;
+}
+
+.nova-modules {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.nova-module {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.module-label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.module-bar {
+    height: 4px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.module-progress {
+    height: 100%;
+    background: #38bdf8;
+    box-shadow: 0 0 8px #38bdf8;
+    transition: width 0.3s ease;
+}
