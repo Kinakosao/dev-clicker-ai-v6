@@ -229,6 +229,7 @@ footer {
 .floating-text.normal { color: var(--accent-primary); text-shadow: 0 0 10px var(--accent-primary); }
 .floating-text.crit { color: var(--accent-gold); text-shadow: 0 0 20px var(--accent-gold); font-size: 1.75rem; }
 .floating-text.ai { color: var(--accent-tech); text-shadow: 0 0 15px var(--accent-tech); }
+.floating-text.pink { color: #f472b6; text-shadow: 0 0 10px #f472b6; }
 
 /* --- Shadow Den: Glitch-Wave --- */
 #panel-den {

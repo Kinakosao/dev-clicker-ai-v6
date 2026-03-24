@@ -47,7 +47,8 @@ let state = {
         inject: { lastUsed: 0, cd: 300000, req: 1000000 },
         firewall: { lastUsed: 0, cd: 600000, req: 10000000 }
     },
-    contracts: []
+    contracts: [],
+    casino: { ub: 0, totalUB: 0 }
 };
 
 let isOverclock = false;
@@ -109,6 +110,13 @@ function addLines(n, manual = false) {
         AudioEngine.playClick(getLPS());
         FX.spawn(window.event?.clientX, window.event?.clientY);
         FX.spawnText(window.event?.clientX, window.event?.clientY, `+${format(n)}`);
+
+        // UB Drop Logic (1% chance)
+        if (Math.random() < 0.01) {
+            state.casino.ub++;
+            state.casino.totalUB++;
+            FX.spawnText(window.event?.clientX, window.event?.clientY, "UB!", "pink");
+        }
     }
 
     updateUI();
@@ -199,6 +207,13 @@ function updateUI() {
 
     updateCards();
     renderContracts();
+
+    // Shadow Den Unlock Check
+    const denTab = document.getElementById('tab-den');
+    if (state.totalLines >= 1000000) {
+        denTab.classList.remove('locked');
+        document.getElementById('ub-points').textContent = format(state.casino.ub);
+    }
 }
 
 function renderContracts() {
