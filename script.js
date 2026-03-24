@@ -2,6 +2,8 @@
  * Dev Clicker v6.0 - The Singularity Core
  */
 
+import { BitCrash } from './casino.js';
+
 // --- Data ---
 const UPGRADES = [
     { id: 'script', name: 'Bash Script', cost: 15, lps: 1, desc: 'Automatisation basique.' },
@@ -55,6 +57,7 @@ let isOverclock = false;
 let isFirewall = false;
 let isHacker = false;
 let hackerHealth = 100;
+let crashGame;
 
 // Init Maps
 UPGRADES.forEach(u => state.upgrades[u.id] = 0);
@@ -553,6 +556,15 @@ if (window.AI) AI.init();
 initUI(); initTabs(); updateUI();
 handleOffline();
 writeConsole("THE SINGULARITY v6.0 : CHARGEMENT DU NOYAU");
+
+crashGame = new BitCrash(state, updateUI, writeConsole);
+document.getElementById('crash-btn').onclick = () => {
+    if (crashGame.status === 'running') {
+        crashGame.cashOut();
+    } else if (crashGame.status === 'idle') {
+        crashGame.start();
+    }
+};
 
 setInterval(() => {
     const lps = getLPS();

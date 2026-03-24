@@ -304,3 +304,60 @@ footer {
     0% { transform: translateY(-100%); }
     100% { transform: translateY(100%); }
 }
+
+/* --- Bit-Crash --- */
+.crash-game {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(244, 114, 182, 0.2);
+    border-radius: 16px;
+    padding: 1.5rem;
+    width: 100%;
+    text-align: center;
+}
+
+#crash-multiplier {
+    font-family: 'Fira Code', monospace;
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 1rem 0;
+    color: var(--text-muted);
+    transition: color 0.1s;
+}
+
+.crash-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+#crash-bet {
+    flex: 1;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.5rem;
+    color: var(--text-main);
+    font-family: 'Fira Code', monospace;
+    text-align: center;
+}
+
+#crash-bet:focus {
+    outline: none;
+    border-color: var(--accent-tech);
+}
+
+.action-btn.cashout {
+    background: var(--accent-tech);
+    border-color: #f472b6;
+    color: white;
+}
+
+.action-btn.crashed {
+    background: var(--danger);
+    border-color: var(--danger);
+    cursor: not-allowed;
+}
+
+.action-btn.success {
+    background: var(--success);
+    border-color: var(--success);
+}
