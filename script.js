@@ -2,7 +2,7 @@
  * Dev Clicker v6.0 - The Singularity Core
  */
 
-import { BitCrash } from './casino.js';
+import { BitCrash, HexSlots } from './casino.js';
 
 // --- Data ---
 const UPGRADES = [
@@ -56,8 +56,10 @@ let state = {
 let isOverclock = false;
 let isFirewall = false;
 let isHacker = false;
+let isOverload = false;
 let hackerHealth = 100;
 let crashGame;
+let hexSlots;
 
 // Init Maps
 UPGRADES.forEach(u => state.upgrades[u.id] = 0);
@@ -80,6 +82,7 @@ function getLPS() {
         if(state.synergies.includes(s.id) && s.target === 'global') mult *= s.mult;
     });
     if(isOverclock) mult *= 2;
+    if(isOverload) mult *= 10;
     return base * mult;
 }
 
@@ -564,6 +567,23 @@ document.getElementById('crash-btn').onclick = () => {
     } else if (crashGame.status === 'idle') {
         crashGame.start();
     }
+};
+
+hexSlots = new HexSlots(state, updateUI, writeConsole);
+document.getElementById('slot-btn').onclick = () => hexSlots.spin();
+
+window.triggerOverload = () => {
+    if (isOverload) return;
+    isOverload = true;
+    document.body.classList.add('overload-active');
+    writeConsole("!! SYSTEM OVERLOAD !! x10 LPS ACTIVÉ", "success");
+    if (window.AudioEngine) AudioEngine.playAlert();
+    
+    setTimeout(() => {
+        isOverload = false;
+        document.body.classList.remove('overload-active');
+        writeConsole("Fin du System Overload.");
+    }, 30000);
 };
 
 setInterval(() => {

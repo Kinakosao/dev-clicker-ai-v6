@@ -361,3 +361,81 @@ footer {
     background: var(--success);
     border-color: var(--success);
 }
+
+/* --- Hex-Slots --- */
+.slots-game {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(244, 114, 182, 0.2);
+    border-radius: 16px;
+    padding: 1.5rem;
+    width: 100%;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+#slot-reels {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    margin: 1rem 0;
+}
+
+.slot-reel {
+    width: 50px;
+    height: 70px;
+    background: #000;
+    border: 2px solid #f472b6;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fira Code', monospace;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #f472b6;
+    text-shadow: 0 0 10px rgba(244, 114, 182, 0.6);
+}
+
+.slot-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+#slot-bet {
+    flex: 1;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.5rem;
+    color: var(--text-main);
+    font-family: 'Fira Code', monospace;
+    text-align: center;
+}
+
+#slot-bet:focus { outline: none; border-color: #f472b6; }
+
+/* --- Overload UI --- */
+#overload-indicator {
+    display: none;
+    font-family: 'Fira Code', monospace;
+    font-weight: 900;
+    color: var(--accent-gold);
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    animation: pulse-gold 1s infinite alternate;
+    margin-bottom: 0.5rem;
+}
+
+@keyframes pulse-gold {
+    from { opacity: 0.4; text-shadow: 0 0 5px var(--accent-gold); }
+    to { opacity: 1; text-shadow: 0 0 20px var(--accent-gold); }
+}
+
+body.overload-active #overload-indicator {
+    display: block;
+}
+
+body.overload-active #canvas-bg {
+    filter: hue-rotate(180deg) contrast(1.5);
+}

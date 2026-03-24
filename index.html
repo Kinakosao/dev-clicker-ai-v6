@@ -60,6 +60,19 @@
                                 <button class="action-btn" id="crash-btn">BET</button>
                             </div>
                         </div>
+
+                        <div class="slots-game">
+                            <h3 style="font-size: 0.8rem; margin-bottom: 0.5rem; text-transform: uppercase;">Hex-Slots</h3>
+                            <div id="slot-reels">
+                                <div class="slot-reel" id="slot-reel-1">0</div>
+                                <div class="slot-reel" id="slot-reel-2">0</div>
+                                <div class="slot-reel" id="slot-reel-3">0</div>
+                            </div>
+                            <div class="slot-controls">
+                                <input type="number" id="slot-bet" value="50" min="1">
+                                <button class="action-btn" id="slot-btn">SPIN</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -68,6 +81,7 @@
         <!-- MAIN VIEW: CORE & SKILLS -->
         <main>
             <div class="score-display">
+                <div id="overload-indicator">SYSTEM OVERLOAD X10</div>
                 <div id="score">0</div>
                 <div class="lps-display"><span>CODE/SEC:</span> <span id="lps">0</span></div>
             </div>
