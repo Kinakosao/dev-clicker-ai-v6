@@ -69,6 +69,18 @@ const AI = {
             console.error("AI Sentiment analysis failed", e);
             return { label: 'NEUTRAL', score: 0.5 };
         }
+    },
+    async generateNovaMission() {
+        try {
+            const pipe = await this.loadModel('text-generation', 'onnx-community/Llama-3.2-1B-Instruct-q4f16');
+            const prompt = `Generate a cyberpunk developer mission. The objective is to compile a certain amount of lines of code. Keep it under 15 words.`;
+            const output = await pipe(prompt, { max_new_tokens: 25, temperature: 0.8 });
+            const desc = output[0].generated_text.replace(prompt, '').trim();
+            return desc || "Opération de compilation majeure.";
+        } catch (e) {
+            console.error("Nova Mission generation failed", e);
+            return "Interception de données critiques.";
+        }
     }
 };
 

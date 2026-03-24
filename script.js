@@ -17,8 +17,30 @@ const UPGRADES = [
 const SYNERGIES = [
     { id: 'syn_1', name: 'Optimisation IA', req: { ai: 10, freelance: 50 }, mult: 2, target: 'freelance', desc: 'Les IA guident les freelances : Freelances x2.' },
     { id: 'syn_2', name: 'Cloud Computing', req: { server: 50, datacenter: 5 }, mult: 1.5, target: 'global', desc: 'Architecture optimisée : Global x1.5.' },
-    { id: 'syn_3', name: 'Singularité', req: { neural: 20 }, mult: 2, target: 'global', desc: 'Éveil technologique : Global x2.' }
+    { id: 'syn_3', name: 'Singularité', req: { neural: 20 }, mult: 2, target: 'global', desc: 'Éveil technologique : Global x2.' },
+    { id: 'syn_nova_1', name: 'Algorithme Prédictif', req: { ai: 20 }, mult: 1.5, target: 'global', desc: 'Nova affine ses calculs : Global x1.5.' },
+    { id: 'syn_nova_2', name: 'Nexus Neural', req: { neural: 50 }, mult: 2, target: 'ai', desc: 'Fusion homme-machine : IA x2.' }
 ];
+
+// ... inside boot section ...
+
+// Nova Narrative Mission Loop
+setInterval(async () => {
+    if (state.nova.activePowers.includes('narrative') && window.AI) {
+        const desc = await AI.generateNovaMission();
+        const target = Math.floor(state.totalLines * 1.8 + 50000);
+        const reward = Math.floor(target * 0.25);
+        state.contracts.push({
+            id: Date.now(),
+            target,
+            reward,
+            description: `MISSION NOVA : ${desc} (Compiler ${format(target)})`,
+            active: true
+        });
+        writeConsole("NOVA : Nouvelle mission prioritaire détectée.", "info");
+        renderContracts();
+    }
+}, 300000); // 5 minutes
 
 const TECH_NEWS = [
     "Une faille majeure découverte dans le protocole de chiffrement quantique.",
@@ -43,6 +65,13 @@ let state = {
     synergies: [],
     unlocked: [],
     stock: { price: 100, history: [], owned: 0, spent: 0 },
+    nova: {
+        tacticalExp: 0,
+        automationExp: 0,
+        narrativeExp: 0,
+        activePowers: [],
+        isAutoBuy: false
+    },
     lastSave: Date.now(),
     skills: {
         overclock: { lastUsed: 0, cd: 60000, duration: 30000 },
@@ -83,6 +112,13 @@ function getLPS() {
     });
     if(isOverclock) mult *= 2;
     if(isOverload) mult *= 10;
+    
+    // Nova Automation Bonus (+10% per 100 manual clicks)
+    if (state.nova.activePowers.includes('automation')) {
+        const bonusCount = Math.floor(state.clicks / 100);
+        mult *= (1 + (bonusCount * 0.1));
+    }
+
     return base * mult;
 }
 
@@ -100,6 +136,15 @@ function addLines(n, manual = false) {
 
     state.lines += n;
     if(n > 0) state.totalLines += n;
+
+    // Nova Evolution Tracking
+    if (manual) {
+        state.nova.narrativeExp++;
+        if (state.nova.narrativeExp >= 500 && !state.nova.activePowers.includes('narrative')) {
+            state.nova.activePowers.push('narrative');
+            writeConsole("NOVA : MODULE NARRATIF ACTIVÉ. J'ai de nouveaux jobs pour vous.", "info");
+        }
+    }
 
     // Check Contracts
     state.contracts.forEach(c => {
@@ -219,6 +264,28 @@ function updateUI() {
     if (state.totalLines >= 1000000) {
         denTab.classList.remove('locked');
         document.getElementById('ub-points').textContent = format(state.casino.ub);
+    }
+
+    // Nova HUD Progress
+    updateNovaHUD();
+}
+
+function updateNovaHUD() {
+    const tP = Math.min(100, (state.nova.tacticalExp / 5) * 100);
+    const aP = Math.min(100, (state.nova.automationExp / 50) * 100);
+    const nP = Math.min(100, (state.nova.narrativeExp / 500) * 100);
+
+    const tBar = document.getElementById('nova-tactical-progress');
+    const aBar = document.getElementById('nova-automation-progress');
+    const nBar = document.getElementById('nova-narrative-progress');
+
+    if (tBar) tBar.style.width = tP + '%';
+    if (aBar) aBar.style.width = aP + '%';
+    if (nBar) nBar.style.width = nP + '%';
+
+    const autoBuyControl = document.getElementById('nova-autobuy-control');
+    if (autoBuyControl) {
+        autoBuyControl.style.display = state.nova.activePowers.includes('automation') ? 'block' : 'none';
     }
 }
 
@@ -356,6 +423,16 @@ function buyUpgrade(id) {
     if(state.lines >= cost) {
         state.lines -= cost;
         state.upgrades[id]++;
+
+        // Nova Automation Tracking
+        state.nova.automationExp++;
+        if (state.nova.automationExp >= 50) {
+            if (!state.nova.activePowers.includes('automation')) {
+                state.nova.activePowers.push('automation');
+                writeConsole("NOVA : MODULE AUTOMATION ACTIVÉ. Je peux maintenant optimiser vos achats.", "info");
+            }
+        }
+
         AudioEngine.playSuccess();
         updateUI();
 
@@ -505,6 +582,7 @@ async function updateAIStock() {
     
     const isPositive = sentiment.label === 'POSITIVE';
     state.stock.price *= isPositive ? 1.2 : 0.8;
+    STOCK.futurePrices = []; // Clear future prices to force recalculation after impact
     
     writeConsole(`NEWS: ${news}`, isPositive ? "success" : "danger");
     
@@ -518,16 +596,39 @@ async function updateAIStock() {
 }
 
 const STOCK = {
+    futurePrices: [],
     update() {
-        const trend = (Math.random() - 0.5) * 12;
-        state.stock.price = Math.max(10, state.stock.price + trend);
+        // Ensure we have future prices for prediction
+        while (this.futurePrices.length < 10) {
+            const lastP = this.futurePrices.length > 0 ? this.futurePrices[this.futurePrices.length - 1] : state.stock.price;
+            const trend = (Math.random() - 0.5) * 12;
+            this.futurePrices.push(Math.max(10, lastP + trend));
+        }
+
+        const nextPrice = this.futurePrices.shift();
+        const oldPrice = state.stock.price;
+        state.stock.price = nextPrice;
+        
         state.stock.history.push(state.stock.price);
         if(state.stock.history.length > 40) state.stock.history.shift();
         
         const priceEl = document.getElementById('stock-price');
-        priceEl.textContent = `$${state.stock.price.toFixed(2)}`;
-        priceEl.style.color = trend > 0 ? 'var(--success)' : 'var(--danger)';
+        if (priceEl) {
+            priceEl.textContent = `$${state.stock.price.toFixed(2)}`;
+            priceEl.style.color = state.stock.price > oldPrice ? 'var(--success)' : 'var(--danger)';
+        }
         
+        // Nova Prediction (10s ahead = 5th element in futurePrices, since updates are every 2s)
+        if (state.nova && state.nova.activePowers.includes('tactical')) {
+            const futureP = this.futurePrices[4];
+            const isBullish = futureP > state.stock.price;
+            const msgEl = document.getElementById('nova-msg');
+            if (msgEl) {
+                msgEl.textContent = isBullish ? "PREDICTION: BULLISH (↑)" : "PREDICTION: BEARISH (↓)";
+                msgEl.style.color = isBullish ? "#38bdf8" : "#fb7185"; // Nova cyan or coral
+            }
+        }
+
         this.draw();
     },
     draw() {
@@ -571,6 +672,47 @@ document.getElementById('crash-btn').onclick = () => {
 
 hexSlots = new HexSlots(state, updateUI, writeConsole);
 document.getElementById('slot-btn').onclick = () => hexSlots.spin();
+
+// --- Stock Event Listeners ---
+document.getElementById('btn-buy-stock').onclick = () => {
+    const cost = state.stock.price;
+    if (state.lines >= cost) {
+        state.lines -= cost;
+        state.stock.owned++;
+        state.stock.spent += cost;
+        writeConsole(`ACHAT : 1 action à $${cost.toFixed(2)}`, "success");
+        updateUI();
+    } else {
+        writeConsole("LDC insuffisants pour acheter du stock.", "danger");
+    }
+};
+
+document.getElementById('btn-sell-stock').onclick = () => {
+    if (state.stock.owned > 0) {
+        let earned = state.stock.owned * state.stock.price;
+        
+        // Nova Tactical Tracking (Profitable trade?)
+        if (earned > state.stock.spent) {
+            state.nova.tacticalExp++;
+            if (state.nova.tacticalExp >= 5 && !state.nova.activePowers.includes('tactical')) {
+                state.nova.activePowers.push('tactical');
+                writeConsole("NOVA : MODULE TACTIQUE ACTIVÉ. Je prédis les flux de données.", "info");
+            }
+        }
+
+        if (state.nova && state.nova.activePowers.includes('tactical')) {
+            earned *= 1.05; // 5% bonus for tactical module
+        }
+        state.lines += earned;
+        const totalSold = state.stock.owned;
+        state.stock.owned = 0;
+        state.stock.spent = 0;
+        writeConsole(`VENTE : ${totalSold} actions. +${format(earned)} LDC (Bonus Tactical incl.).`, "success");
+        updateUI();
+    } else {
+        writeConsole("Vous n'avez aucune action à vendre.", "danger");
+    }
+};
 
 window.triggerOverload = () => {
     if (isOverload) return;
@@ -628,3 +770,35 @@ if (keyboard) {
 }
 
 window.onresize = () => { FX.init(); STOCK.draw(); };
+
+// --- Nova Automation Module (Auto-Buyer) ---
+setInterval(() => {
+    if (state.nova.activePowers.includes('automation') && state.nova.isAutoBuy) {
+        // Find cheapest upgrade
+        let cheapest = null;
+        let minCost = Infinity;
+
+        UPGRADES.forEach(u => {
+            const count = state.upgrades[u.id];
+            const cost = Math.floor(u.cost * Math.pow(1.15, count));
+            if (cost < minCost) {
+                minCost = cost;
+                cheapest = u;
+            }
+        });
+
+        // Auto-buy if we have twice the cost (safety buffer)
+        if (cheapest && state.lines >= minCost * 2) {
+            buyUpgrade(cheapest.id);
+            writeConsole(`NOVA (Auto-Buy) : Optimisation via ${cheapest.name}.`, "info");
+        }
+    }
+}, 3000);
+
+const autoBuyToggle = document.getElementById('nova-autobuy-toggle');
+if (autoBuyToggle) {
+    autoBuyToggle.onchange = (e) => {
+        state.nova.isAutoBuy = e.target.checked;
+        writeConsole(`NOVA : Auto-Buy ${state.nova.isAutoBuy ? 'activé' : 'désactivé'}.`, "info");
+    };
+}
